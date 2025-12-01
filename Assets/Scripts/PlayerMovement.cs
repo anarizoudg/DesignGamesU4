@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public DifficultyManager difficultyManager; // Ahora está dentro de la clase
     public float speed = 5f;       // velocidad en X y Z
     public float jumpForce = 6f;   // fuerza de salto en Y
     private Rigidbody rb;
@@ -19,8 +20,10 @@ public class PlayerMovement : MonoBehaviour
         float moveX = Input.GetAxis("Horizontal"); // A / D o flechas ← →
         float moveZ = Input.GetAxis("Vertical");   // W / S o flechas ↑ ↓
 
+        float currentSpeed = speed * difficultyManager.GetDifficulty();
+
         // Crear el vector de movimiento
-        Vector3 movement = new Vector3(moveX * speed, rb.linearVelocity.y, moveZ * speed);
+        Vector3 movement = new Vector3(moveX * currentSpeed, rb.linearVelocity.y, moveZ * currentSpeed);
 
         // Aplicar movimiento
         rb.linearVelocity = movement;
