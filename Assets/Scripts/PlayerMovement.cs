@@ -2,30 +2,47 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public DifficultyManager difficultyManager; // Ahora está dentro de la clase
-    public float speed = 5f;       // velocidad en X y Z
-    public float jumpForce = 6f;   // fuerza de salto en Y
+    public float speed = 5f;
+    public float boostedSpeed = 10f;  // velocidad durante el boost
+    private float currentSpeed;
+
+    public float jumpForce = 6f;
     private Rigidbody rb;
 
     private bool isGrounded = true;
+    private bool isBoosting = false;
+    private float boostTimer = 0f;
+    public float boostDuration = 3f; // duración máxima
+
+    // Referencia a la barra del boost
+    public BoostBar boostBar;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        currentSpeed = speed;
+
+        if (boostBar != null)
+            boostBar.SetMaxTime(boostDuration);
     }
 
     void Update()
     {
-        // Movimiento horizontal (X) e inclinación (Z)
-        float moveX = Input.GetAxis("Horizontal"); // A / D o flechas ← →
-        float moveZ = Input.GetAxis("Vertical");   // W / S o flechas ↑ ↓
+        // Si está en boost, reducir el tiempo
+        if (isBoosting)
+        {
+            boostTimer -= Time.deltaTime;
+            boostBar.SetTime(boostTimer);
 
-        float currentSpeed = speed * difficultyManager.GetDifficulty();
+            if (boostTimer <= 0)
+                EndBoost();
+        }
 
-        // Crear el vector de movimiento
+        // Leer movimiento
+        float moveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
+
         Vector3 movement = new Vector3(moveX * currentSpeed, rb.linearVelocity.y, moveZ * currentSpeed);
-
-        // Aplicar movimiento
         rb.linearVelocity = movement;
 
         // Salto
@@ -38,8 +55,28 @@ public class PlayerMovement : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        // Detectar si tocó el piso
         if (collision.gameObject.CompareTag("Ground"))
             isGrounded = true;
+    }
+
+    // 🔥 MÉTODO PÚBLICO PARA ACTIVAR EL BOOST
+    public void ActivateBoost()
+    {
+        isBoosting = true;
+        boostTimer = boostDuration;
+        currentSpeed = boostedSpeed;
+
+        if (boostBar != null)
+            boostBar.ShowBar();
+    }
+
+    // 🔥 Terminar boost
+    void EndBoost()
+    {
+        isBoosting = false;
+        currentSpeed = speed;
+
+        if (boostBar != null)
+            boostBar.HideBar();
     }
 }
