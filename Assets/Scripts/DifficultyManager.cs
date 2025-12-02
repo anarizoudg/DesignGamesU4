@@ -2,16 +2,22 @@ using UnityEngine;
 
 public class DifficultyManager : MonoBehaviour
 {
-    public float difficultyLevel = 1f;
-    public float increaseRate = 0.1f; // dificultad por segundo
+    public float difficulty = 1f;
+    public float difficultyIncreaseRate = 0.1f;
 
     void Update()
     {
-        difficultyLevel += increaseRate * Time.deltaTime;
+        difficulty += difficultyIncreaseRate * Time.deltaTime;
     }
 
     public float GetDifficulty()
     {
-        return difficultyLevel;
+        return difficulty;
+    }
+
+    public void ResetDifficulty()
+    {
+        difficulty = 1f;
     }
 }
+
